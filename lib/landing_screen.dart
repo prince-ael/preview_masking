@@ -14,6 +14,9 @@ class LandingScreen extends StatefulWidget {
 }
 
 class _LandingScreenState extends State<LandingScreen> {
+  Function onAttemptCapture;
+  Function onCancelPhoto;
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
@@ -25,6 +28,10 @@ class _LandingScreenState extends State<LandingScreen> {
   }
 
   Widget _body() {
+    final notifier = Provider.of<CameraNotifier>(context, listen: false);
+    onAttemptCapture = notifier.capturePhoto;
+    onCancelPhoto = notifier.closeCamera;
+
     return Selector<CameraNotifier, List<dynamic>>(
       selector: (context, notifier) => [
         notifier.controller,
@@ -32,7 +39,7 @@ class _LandingScreenState extends State<LandingScreen> {
       ],
       builder: (context, camUtils, _) {
         if (camUtils[0] == null && camUtils[1] == null) {
-          return _closedView();
+          return _closedView(notifier.openCamera);
         } else {
           print("FutureBuilder");
 
@@ -81,18 +88,8 @@ class _LandingScreenState extends State<LandingScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
-              CircularButtonIB(
-                onTapped: () {
-                  print("Cancel");
-                },
-                icon: Icons.clear,
-              ),
-              CameraButton(
-                onTapped: () {
-                  print("camera");
-                },
-                isCapturedSuccessfully: false,
-              ),
+              _cancelButton(),
+              _cameraButton(),
               CircularButtonIB(
                 onTapped: () {
                   print("Unknown");
@@ -130,13 +127,38 @@ class _LandingScreenState extends State<LandingScreen> {
     );
   }
 
-  Widget _closedView() {
-    final notifier = Provider.of<CameraNotifier>(context, listen: false);
+  Widget _cameraButton() {
+    return Selector<CameraNotifier, String>(
+      selector: (context, notifier) => notifier.photoPath,
+      builder: (context, path, _) {
+        return CameraButton(
+          onTapped: onAttemptCapture,
+          isCapturedSuccessfully: path != null,
+        );
+      },
+    );
+  }
+
+  Widget _cancelButton() {
+    return Selector<CameraNotifier, String>(
+      selector: (context, notifier) => notifier.photoPath,
+      builder: (context, path, _) {
+        return path != null
+            ? CircularButtonIB(
+                onTapped: onCancelPhoto,
+                icon: Icons.clear,
+              )
+            : SizedBox();
+      },
+    );
+  }
+
+  Widget _closedView(Function openCamera) {
     return Center(
       child: FlatButton(
         color: Colors.blueAccent,
         textColor: Colors.white,
-        onPressed: notifier.openCamera,
+        onPressed: openCamera,
         child: Text("Open Camera"),
       ),
     );
