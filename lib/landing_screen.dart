@@ -158,12 +158,34 @@ class _LandingScreenState extends State<LandingScreen> {
 
   Widget _closedView(Function openCamera) {
     return Center(
-      child: FlatButton(
-        color: Colors.blueAccent,
-        textColor: Colors.white,
-        onPressed: openCamera,
-        child: Text("Open Camera"),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          FlatButton(
+            color: Colors.blueAccent,
+            textColor: Colors.white,
+            onPressed: openCamera,
+            child: Text("Open Camera"),
+          ),
+          _imagePath(),
+        ],
       ),
+    );
+  }
+
+  Widget _imagePath() {
+    return Selector<CameraNotifier, String>(
+      selector: (context, notifier) => notifier.photoPath,
+      builder: (context, path, _) {
+        if (path == null) {
+          return SizedBox();
+        }
+        print("path: $path");
+        return Padding(
+          padding: EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
+          child: Text(path),
+        );
+      },
     );
   }
 }

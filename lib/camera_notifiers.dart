@@ -101,9 +101,10 @@ class CameraNotifier with ChangeNotifier {
     if (!fileExists) {
       resizedImageFile.createSync();
       resizedImageFile.writeAsBytesSync(
-        Img.encodeJpg(croppedImage, quality: 100),
+        Img.encodeJpg(croppedImage, quality: 65),
       );
     }
+    _photoPath = externalStoragePath;
     closeCamera();
   }
 
