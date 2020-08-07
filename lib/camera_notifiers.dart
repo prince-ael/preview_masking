@@ -22,6 +22,11 @@ class CameraNotifier with ChangeNotifier {
   String _photoPath;
   String get photoPath => _photoPath;
 
+  double _screenWidth;
+  set screenWidth(double sw) {
+    _screenWidth = sw;
+  }
+
   void openCamera() async {
     print("Will Open Camera");
 
@@ -79,7 +84,12 @@ class CameraNotifier with ChangeNotifier {
   void _resizeImage() async {
     File capturedImgFile = File(_photoPath);
     Img.Image capImage = Img.decodeImage(capturedImgFile.readAsBytesSync());
-    Img.Image resizedImage = Img.copyResize(capImage, height: 700);
+    Img.Image resizedImage = Img.copyResize(
+      capImage,
+      width: 600,
+      //width: _screenWidth.round(),
+    );
+    Img.Image croppedImage = Img.copyCrop(resizedImage, 0, 0, 600, 600);
 
     final externalStoragePath = join(
       (await getExternalStorageDirectory()).path,
@@ -91,7 +101,7 @@ class CameraNotifier with ChangeNotifier {
     if (!fileExists) {
       resizedImageFile.createSync();
       resizedImageFile.writeAsBytesSync(
-        Img.encodeJpg(resizedImage, quality: 70),
+        Img.encodeJpg(croppedImage, quality: 100),
       );
     }
     closeCamera();

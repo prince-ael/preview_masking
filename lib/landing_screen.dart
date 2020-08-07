@@ -16,6 +16,7 @@ class LandingScreen extends StatefulWidget {
 class _LandingScreenState extends State<LandingScreen> {
   Function onAttemptCapture;
   Function onCancelPhoto;
+  double _screenWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +32,9 @@ class _LandingScreenState extends State<LandingScreen> {
     final notifier = Provider.of<CameraNotifier>(context, listen: false);
     onAttemptCapture = notifier.capturePhoto;
     onCancelPhoto = notifier.closeCamera;
+    _screenWidth = MediaQuery.of(context).size.width;
+    notifier.screenWidth = _screenWidth;
+    print("ScreenWidth: $_screenWidth");
 
     return Selector<CameraNotifier, List<dynamic>>(
       selector: (context, notifier) => [
@@ -104,12 +108,11 @@ class _LandingScreenState extends State<LandingScreen> {
   }
 
   Widget _square() {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double ovalWidth = (screenWidth * 0.46);
-    double ovalHeight = (screenWidth * 0.60);
+    double ovalWidth = (_screenWidth * 0.46);
+    double ovalHeight = (_screenWidth * 0.60);
     return Container(
-      height: screenWidth,
-      width: screenWidth,
+      height: _screenWidth,
+      width: _screenWidth,
       alignment: Alignment.center,
       //color: Colors.white,
       child: Align(
